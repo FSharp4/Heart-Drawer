@@ -17,23 +17,12 @@ import java.util.Scanner;
  */
 public class HeartDrawer {
 
-  /**
-   * Program entry point
-   * 
-   * @param args [0] Size of heart in radius–pixels (optional); [1] name of textfile (optional)
+  /*
+   * Allowable margin between observed point result and actual parts of the heart equation used.
+   * (Allows us to have a heart :) )
    */
+
   public static void main(String[] args) {
-
-    // Explanation
-    if (args.length == 0) {
-      System.out.println("HeartDrawer.jar");
-      System.out.println(
-          "Usage : 'java -jar HeartDrawer.jar [heart size in radius-pixels] [name of textfile]");
-      System.out
-          .println("Heart size must be specified if name is specified. (Using default size/name.)");
-    }
-
-    // Configure heart size
     int size;
     if (args.length >= 1) {
       size = Integer.parseInt(args[0]);
@@ -41,7 +30,6 @@ public class HeartDrawer {
       size = 7;
     }
 
-    // Configure file name
     String name;
     if (args.length == 2) {
       name = args[1] + ".txt";
@@ -49,7 +37,6 @@ public class HeartDrawer {
       name = "heart.txt";
     }
 
-    // Draw heart shape
     ArrayList<String> heartShape = null;
     try {
       heartShape = drawAHeart(size);
@@ -59,21 +46,16 @@ public class HeartDrawer {
       e.printStackTrace();
       System.exit(1);
     }
-
-    // Configure message
     ArrayList<String> lines = new ArrayList<String>();
     Scanner sc = new Scanner(System.in);
     System.out.print("\rWould you like to write a message? (y/n): ");
     boolean userWrittenMessage = (sc.next().contentEquals("y")) ? true : false;
-    if (userWrittenMessage) {
 
-      // Explanation
+    if (userWrittenMessage) {
       System.out.println("Type below to write a message.");
       System.out.println(
           "Press ENTER to start a new line. Try to keep your lines short to avoid sidescrolling!");
       System.out.println("Type 'END' to end your message.\r");
-
-      // Get user message line-by-line
       while (true) {
         String nextLine = sc.nextLine();
         if (nextLine.contentEquals("END")) {
@@ -93,9 +75,9 @@ public class HeartDrawer {
 
     sc.close();
 
-    // Put all lines into one array-list; start with heart shape
     ArrayList<String> fileLines = heartShape;
     fileLines.add("\r");
+
     for (String line : lines) {
       fileLines.add(line);
     }
@@ -104,6 +86,7 @@ public class HeartDrawer {
     try {
       Files.write(filePath, fileLines, StandardCharsets.UTF_8);
     } catch (IOException e) {
+      // TODO Auto-generated catch block
       System.err.println("Failed to generate file.");
       e.printStackTrace();
       System.exit(1);
@@ -118,40 +101,40 @@ public class HeartDrawer {
    * <a href="https://www.quora.com/What-is-the-equation-that-gives-you-a-heart-on-the-graph">Here
    * (Second answer)</a>
    * 
-   * @param heartSize Size of heart drawn in terms of pixel radius.
-   * @return ArrayList containing strings representing a heart
-   * @throws Exception Heart is too small
+   * @param size Size of heart drawn in terms of pixel radius.
+   * @return
+   * @throws Exception
    */
-  public static ArrayList<String> drawAHeart(int heartSize) throws Exception {
-    // Check heart size
-    if (heartSize < 5) {
-      if (heartSize < 1) {
+  public static ArrayList<String> drawAHeart(int size) throws Exception {
+    if (size < 5) {
+      if (size < 1) {
         throw new Exception("This heart is too small to draw...");
       }
       System.out.println("This heart will be pretty small...");
-    } else if (heartSize > 16) {
+    } else if (size > 16) {
       System.out.println("WOW! This heart is huge!");
     }
 
-    //Find points on/near heart curve
-    boolean[][] points = new boolean[(int) (heartSize * 2.5)][heartSize * 2 + 1];
+    int heartRadius = size * size;
+    boolean[][] points = new boolean[(int) (size * 2.5)][size * 2 + 1];
+
     for (int y = 0; y < points.length; y++) {
       for (int x = 0; x < points[y].length; x++) {
-        float offsetX = x - heartSize;
-        float offsetY = y - heartSize;
+        float offsetX = x - size;
+        float offsetY = y - size;
         // referencing the equation
         float leftHandSide =
-            square(offsetX) + square((float) (offsetY - Math.pow(square(offsetX), 1 / 3.0)));
-        int rightHandSide = heartSize * heartSize;
+            square(offsetX) + square((float) (offsetY - Math.pow(square (offsetX), 1/3.0)));
+        int rightHandSide = size * size;
 
-        if (Math.abs(rightHandSide - leftHandSide) < heartSize) { // Size used as margin of 
-          points[y][x] = true;                                    // inclusion
+        if (Math.abs(rightHandSide - leftHandSide) < size) {
+          points[y][x] = true;
         }
       }
     }
 
-    // Assemble these points into printable form
     ArrayList<String> heartShape = new ArrayList<String>();
+
     for (int y = points.length - 1; y >= 0; y--) {
       StringBuilder sb = new StringBuilder();
       for (int x = 0; x < points[y].length; x++) {
@@ -169,11 +152,8 @@ public class HeartDrawer {
     return heartShape;
   }
 
-  /*
-   * Squares a number.
-   * For convenience.
-   */
   private static float square(float number) {
     return number * number; // for convenience
   }
+
 }
